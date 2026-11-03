@@ -19,15 +19,22 @@ export type CategoryId = "fresh-market" | "study-tech" | "everyday-carry" | "hom
 export type Badge = "VALUE" | "NEW" | "POPULAR";
 
 export interface Product {
-  id: string;
+  _id: string;
   name: string;
-  price: number;
-  badge?: Badge;
-  category: CategoryId;
-  image: string;
-  images: string[];
   description: string;
-  details: string[];
+  price: number;
+  image: string;
+  category: string;
+  quantity: number;
+  vendor: {
+    _id: string;
+    name: string;
+    storeName: string;
+    location: string;
+    phone: string;
+    bio: string;
+    profilePicture: string;
+  };
 }
 
 export const categories: { id: CategoryId; label: string }[] = [

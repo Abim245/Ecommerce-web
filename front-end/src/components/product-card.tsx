@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Minus, Plus } from "lucide-react";
-import { formatNaira, type Product } from "@/data/products";
+import { formatNaira } from "@/data/products";
 import { useCart } from "@/lib/cart";
 import { cn } from "@/lib/utils";
+import type { Product } from "@/types/product";
 
 export function ProductCard({ product }: { product: Product }) {
   const { add } = useCart();
@@ -18,7 +19,7 @@ export function ProductCard({ product }: { product: Product }) {
   }, []);
 
   const handleAdd = () => {
-    add(product.id, qty);
+    add(product, qty);
     setAdded(true);
     setQty(1);
     if (timer.current) clearTimeout(timer.current);
@@ -29,14 +30,14 @@ export function ProductCard({ product }: { product: Product }) {
     <div className="flex flex-col gap-3">
       <Link
         to="/products/$productId"
-        params={{ productId: product.id }}
+        params={{ productId: product._id }}
         className="relative block overflow-hidden rounded-xl bg-white"
       >
-        {product.badge ? (
+        {/* {product.badge ? (
           <span className="absolute left-3 top-3 z-10 rounded-full bg-lime px-3 py-1 text-[11px] font-bold tracking-widest text-ink">
             {product.badge}
           </span>
-        ) : null}
+        ) : null} */}
         <img
           src={product.image}
           alt={product.name}
@@ -50,7 +51,7 @@ export function ProductCard({ product }: { product: Product }) {
         <div>
           <Link
             to="/products/$productId"
-            params={{ productId: product.id }}
+            params={{ productId: product._id }}
             className="text-sm font-bold leading-snug transition-colors hover:text-cobalt"
           >
             <h3>{product.name}</h3>
