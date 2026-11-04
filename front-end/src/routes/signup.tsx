@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AuthShell } from "@/components/auth-shell";
 import { cn } from "@/lib/utils";
+import { apiFetch } from "@/lib/api";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({
@@ -32,7 +33,44 @@ const labelClass = "text-[11px] font-bold tracking-[0.15em] text-muted-foregroun
 function SignUp() {
   const [accountType, setAccountType] = useState<AccountType>("customer");
   const [created, setCreated] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [address, setAddress] = useState("");
+  async function handleSignUp(event: React.FormEvent<HTMLFormElement>) {
+  event.preventDefault();
 
+  setLoading(true);
+  setError("");
+  setCreated(false);
+
+  try {
+    await apiFetch("/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        phone,
+        email,
+        password,
+        address,
+      }),
+    });
+
+    setCreated(true);
+  } catch (err) {
+    setError(
+      err instanceof Error ? err.message : "Something went wrong. Please try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+}
   return (
     <AuthShell>
       <div>
@@ -74,15 +112,12 @@ function SignUp() {
 
         <form
           className="mt-8 space-y-5"
-          onSubmit={(event) => {
-            event.preventDefault();
-            setCreated(true);
-          }}
+          onSubmit={handleSignUp}
         >
           {created ? (
             <div className="rounded-2xl bg-lime px-6 py-4 text-sm font-bold text-ink">
               {accountType === "customer"
-                ? "Customer account created — welcome to MarketDay!"
+                ? loading ? "Creating account..." : "Create customer account"
                 : "Vendor account created — we'll be in touch to set up your store."}
             </div>
           ) : null}
@@ -90,16 +125,48 @@ function SignUp() {
           <div className="grid gap-5 md:grid-cols-2">
             <label className="block">
               <span className={labelClass}>FULL NAME</span>
-              <input required type="text" placeholder="Your name" className={inputClass} />
+              <input
+                required
+                type="text"
+                placeholder="Your name"
+                className={inputClass}
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+              />
             </label>
             <label className="block">
               <span className={labelClass}>PHONE NUMBER</span>
-              <input required type="tel" placeholder="+234" className={inputClass} />
+              <input
+                required
+                type="tel"
+                placeholder="+234"
+                className={inputClass}
+                value={phone}
+                onChange={(event) => setPhone(event.target.value)}
+              />
             </label>
           </div>
           <label className="block">
             <span className={labelClass}>EMAIL ADDRESS</span>
-            <input required type="email" placeholder="you@example.com" className={inputClass} />
+            <input
+              required
+              type="email"
+              placeholder="you@example.com"
+              className={inputClass}
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+            />
+          </label>
+          <label className="block">
+            <span className={labelClass}>HOME / DELIVERY ADDRESS</span>
+            <input
+              required
+              type="text"
+              placeholder="Street, area and city"
+              className={inputClass}
+              value={address}
+              onChange={(event) => setAddress(event.target.value)}
+            />
           </label>
           <label className="block">
             <span className={labelClass}>PASSWORD</span>
@@ -109,6 +176,8 @@ function SignUp() {
               minLength={8}
               placeholder="At least 8 characters"
               className={inputClass}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
             />
           </label>
 
@@ -152,6 +221,11 @@ function SignUp() {
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Already registered?{" "}
+          {error ? (
+              <div className="rounded-2xl bg-destructive/10 px-6 py-4 text-sm text-destructive">
+                {error}
+              </div>
+            ) : null}
           <Link
             to="/signin"
             className="font-bold text-cobalt transition-colors hover:text-cobalt/80"
