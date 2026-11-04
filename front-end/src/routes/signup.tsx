@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AuthShell } from "@/components/auth-shell";
 import { cn } from "@/lib/utils";
 import { apiFetch } from "@/lib/api";
@@ -40,6 +40,7 @@ function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [address, setAddress] = useState("");
+  const navigate = useNavigate();
   async function handleSignUp(event: React.FormEvent<HTMLFormElement>) {
   event.preventDefault();
 
@@ -48,21 +49,25 @@ function SignUp() {
   setCreated(false);
 
   try {
-    await apiFetch("/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await apiFetch<{ message: string; token: string }>(
+      "/auth/register",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          phone,
+          email,
+          password,
+          address,
+        }),
       },
-      body: JSON.stringify({
-        name,
-        phone,
-        email,
-        password,
-        address,
-      }),
-    });
+    );
 
-    setCreated(true);
+localStorage.setItem("marketday-token", response.token);
+await navigate({ to: "/" });
   } catch (err) {
     setError(
       err instanceof Error ? err.message : "Something went wrong. Please try again."
