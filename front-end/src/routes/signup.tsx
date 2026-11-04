@@ -40,8 +40,13 @@ function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [address, setAddress] = useState("");
+  const [storeName, setStoreName] = useState("");
+  const [location, setLocation] = useState("");
+  const [bio, setBio] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
   const navigate = useNavigate();
-  async function handleSignUp(event: React.FormEvent<HTMLFormElement>) {
+
+async function handleSignUp(event: React.FormEvent<HTMLFormElement>) {
   event.preventDefault();
 
   setLoading(true);
@@ -49,6 +54,26 @@ function SignUp() {
   setCreated(false);
 
   try {
+    if (accountType === "vendor") {
+      await apiFetch("/vendors", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          storeName,
+          location,
+          phone,
+          bio,
+          profilePicture,
+        }),
+      });
+
+      setCreated(true);
+      return;
+    }
+
     const response = await apiFetch<{ message: string; token: string }>(
       "/auth/register",
       {
@@ -66,16 +91,19 @@ function SignUp() {
       },
     );
 
-localStorage.setItem("marketday-token", response.token);
-await navigate({ to: "/" });
+    localStorage.setItem("marketday-token", response.token);
+    await navigate({ to: "/" });
   } catch (err) {
     setError(
-      err instanceof Error ? err.message : "Something went wrong. Please try again."
+      err instanceof Error
+        ? err.message
+        : "Something went wrong. Please try again.",
     );
   } finally {
     setLoading(false);
   }
 }
+
   return (
     <AuthShell>
       <div>
@@ -123,11 +151,9 @@ await navigate({ to: "/" });
           className="mt-8 space-y-5"
           onSubmit={handleSignUp}
         >
-        {created ? (
-          <div className="rounded-2xl bg-lime px-6 py-4 text-sm font-bold text-ink">
-            Customer account created successfully! Welcome to MarketDay.
-          </div>
-        ) : null}
+       {accountType === "vendor"
+          ? "Your vendor profile has been created successfully!"
+          : "Customer account created successfully! Welcome to MarketDay."}
 
           <div className="grid gap-5 md:grid-cols-2">
             <label className="block">
@@ -194,17 +220,25 @@ await navigate({ to: "/" });
               <div className="mt-4 space-y-4">
                 <label className="block">
                   <span className={labelClass}>STORE NAME</span>
-                  <input
-                    required
-                    type="text"
-                    placeholder="Your store name"
-                    className={inputClass}
-                  />
+               <input
+                  required
+                  type="text"
+                  placeholder="Your store name"
+                  className={inputClass}
+                  value={storeName}
+                  onChange={(event) => setStoreName(event.target.value)}
+                />
                 </label>
                 <label className="block">
                   <span className={labelClass}>BUSINESS LOCATION</span>
-                  <input required type="text" placeholder="Area and city" className={inputClass} />
-                </label>
+                <input
+                  required
+                  type="text"
+                  placeholder="Area and city"
+                  className={inputClass}
+                  value={location}
+                  onChange={(event) => setLocation(event.target.value)}
+                />                </label>
                 <label className="block">
                   <span className={labelClass}>WHAT DO YOU SELL?</span>
                   <textarea
@@ -212,6 +246,19 @@ await navigate({ to: "/" });
                     rows={4}
                     placeholder="Tell customers what makes your store useful."
                     className="mt-2 w-full rounded-2xl bg-input px-5 py-3.5 font-mono text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring"
+                    value={bio}
+                    onChange={(event) => setBio(event.target.value)}
+                  />
+                </label>
+                <label className="block">
+                  <span className={labelClass}>PROFILE PICTURE URL</span>
+                  <input
+                    required
+                    type="url"
+                    placeholder="https://example.com/store-image.jpg"
+                    className={inputClass}
+                    value={profilePicture}
+                    onChange={(event) => setProfilePicture(event.target.value)}
                   />
                 </label>
               </div>
