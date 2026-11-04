@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as BagRouteImport } from './routes/bag'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as MyOrdersRouteImport } from './routes/my-orders'
 import { Route as OrderConfirmedRouteImport } from './routes/order-confirmed'
 import { Route as ProductsRouteImport } from './routes/products'
 import { Route as SigninRouteImport } from './routes/signin'
@@ -38,6 +39,11 @@ const CheckoutRoute = CheckoutRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyOrdersRoute = MyOrdersRouteImport.update({
+  id: '/my-orders',
+  path: '/my-orders',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrderConfirmedRoute = OrderConfirmedRouteImport.update({
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/bag': typeof BagRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/my-orders': typeof MyOrdersRoute
   '/order-confirmed': typeof OrderConfirmedRoute
   '/products': typeof ProductsRouteWithChildren
   '/signin': typeof SigninRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/bag': typeof BagRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/my-orders': typeof MyOrdersRoute
   '/order-confirmed': typeof OrderConfirmedRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/bag': typeof BagRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/my-orders': typeof MyOrdersRoute
   '/order-confirmed': typeof OrderConfirmedRoute
   '/products': typeof ProductsRouteWithChildren
   '/signin': typeof SigninRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
     | '/bag'
     | '/checkout'
     | '/contact'
+    | '/my-orders'
     | '/order-confirmed'
     | '/products'
     | '/signin'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/bag'
     | '/checkout'
     | '/contact'
+    | '/my-orders'
     | '/order-confirmed'
     | '/signin'
     | '/signup'
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
     | '/bag'
     | '/checkout'
     | '/contact'
+    | '/my-orders'
     | '/order-confirmed'
     | '/products'
     | '/signin'
@@ -150,6 +162,7 @@ export interface RootRouteChildren {
   BagRoute: typeof BagRoute
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
+  MyOrdersRoute: typeof MyOrdersRoute
   OrderConfirmedRoute: typeof OrderConfirmedRoute
   ProductsRoute: typeof ProductsRouteWithChildren
   SigninRoute: typeof SigninRoute
@@ -184,6 +197,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-orders': {
+      id: '/my-orders'
+      path: '/my-orders'
+      fullPath: '/my-orders'
+      preLoaderRoute: typeof MyOrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/order-confirmed': {
@@ -250,6 +270,7 @@ const rootRouteChildren: RootRouteChildren = {
   BagRoute: BagRoute,
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
+  MyOrdersRoute: MyOrdersRoute,
   OrderConfirmedRoute: OrderConfirmedRoute,
   ProductsRoute: ProductsRouteWithChildren,
   SigninRoute: SigninRoute,

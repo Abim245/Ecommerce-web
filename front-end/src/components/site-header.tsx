@@ -141,25 +141,35 @@ export function SiteHeader() {
           ) : null}
         </div>
 
-       {isLoggedIn ? (
-        <button
-          type="button"
-          onClick={() => {
-            localStorage.removeItem("marketday-token");
-            setIsLoggedIn(false);
-          }}
-          className="rounded-full bg-ink px-5 py-2.5 text-sm font-bold text-primary-foreground transition-colors hover:bg-ink/85"
-        >
-          Log Out
-        </button>
-      ) : (
-        <Link
-          to="/signin"
-          className="rounded-full bg-ink px-5 py-2.5 text-sm font-bold text-primary-foreground transition-colors hover:bg-ink/85"
-        >
-          Log In
-        </Link>
-      )}
+        {isLoggedIn ? (
+          <div className="flex items-center gap-3">
+            <Link
+              to="/my-orders"
+              className="text-sm font-semibold text-foreground transition-colors hover:text-cobalt"
+            >
+              My Orders
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => {
+                localStorage.removeItem("marketday-token");
+                setIsLoggedIn(false);
+              }}
+              className="rounded-full bg-ink px-5 py-2.5 text-sm font-bold text-primary-foreground transition-colors hover:bg-ink/85"
+            >
+              Log Out
+            </button>
+          </div>
+        ) : (
+          <Link
+            to="/signin"
+            className="rounded-full bg-ink px-5 py-2.5 text-sm font-bold text-primary-foreground transition-colors hover:bg-ink/85"
+          >
+            Log In
+          </Link>
+        )}
+
       </div>
     </header>
   );
