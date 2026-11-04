@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AuthShell } from "@/components/auth-shell";
 import { apiFetch } from "@/lib/api";
 export const Route = createFileRoute("/signin")({
@@ -28,6 +28,7 @@ function SignIn() {
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
   async function handleSignIn(event: React.FormEvent<HTMLFormElement>) {
   event.preventDefault();
 
@@ -46,9 +47,9 @@ function SignIn() {
       }),
     });
 
-    localStorage.setItem("marketday-token", response.token);
+   localStorage.setItem("marketday-token", response.token);
 
-    setSignedIn(true);
+    await navigate({ to: "/" });
   } catch (err) {
     setError(
       err instanceof Error ? err.message : "Unable to sign in. Please try again."
