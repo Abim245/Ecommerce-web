@@ -109,18 +109,20 @@ function SignUp() {
             </button>
           ))}
         </div>
-
+             {error ? (
+              <div className="rounded-2xl bg-destructive/10 px-6 py-4 text-sm text-destructive">
+                {error}
+              </div>
+            ) : null}
         <form
           className="mt-8 space-y-5"
           onSubmit={handleSignUp}
         >
-          {created ? (
-            <div className="rounded-2xl bg-lime px-6 py-4 text-sm font-bold text-ink">
-              {accountType === "customer"
-                ? loading ? "Creating account..." : "Create customer account"
-                : "Vendor account created — we'll be in touch to set up your store."}
-            </div>
-          ) : null}
+        {created ? (
+          <div className="rounded-2xl bg-lime px-6 py-4 text-sm font-bold text-ink">
+            Customer account created successfully! Welcome to MarketDay.
+          </div>
+        ) : null}
 
           <div className="grid gap-5 md:grid-cols-2">
             <label className="block">
@@ -221,11 +223,7 @@ function SignUp() {
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Already registered?{" "}
-          {error ? (
-              <div className="rounded-2xl bg-destructive/10 px-6 py-4 text-sm text-destructive">
-                {error}
-              </div>
-            ) : null}
+       
           <Link
             to="/signin"
             className="font-bold text-cobalt transition-colors hover:text-cobalt/80"
