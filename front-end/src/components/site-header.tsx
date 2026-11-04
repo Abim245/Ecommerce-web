@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Search, ShoppingBag, ShoppingBasket, X } from "lucide-react";
 import { formatNaira } from "@/data/products";
@@ -13,7 +13,19 @@ const navLinks = [
 export function SiteHeader() {
   const { lines, count, total, remove } = useCart();
   const [cartOpen, setCartOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+    useEffect(() => {
+      const checkLogin = () => {
+        setIsLoggedIn(Boolean(localStorage.getItem("marketday-token")));
+      };
+
+      checkLogin();
+
+      window.addEventListener("storage", checkLogin);
+
+      return () => window.removeEventListener("storage", checkLogin);
+    }, []);
   return (
     <header className="relative z-40 border-b border-border bg-background">
       <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-4 md:px-8">
@@ -129,12 +141,25 @@ export function SiteHeader() {
           ) : null}
         </div>
 
+       {isLoggedIn ? (
+        <button
+          type="button"
+          onClick={() => {
+            localStorage.removeItem("marketday-token");
+            setIsLoggedIn(false);
+          }}
+          className="rounded-full bg-ink px-5 py-2.5 text-sm font-bold text-primary-foreground transition-colors hover:bg-ink/85"
+        >
+          Log Out
+        </button>
+      ) : (
         <Link
           to="/signin"
           className="rounded-full bg-ink px-5 py-2.5 text-sm font-bold text-primary-foreground transition-colors hover:bg-ink/85"
         >
           Log In
         </Link>
+      )}
       </div>
     </header>
   );
