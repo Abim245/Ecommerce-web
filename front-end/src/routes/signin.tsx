@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AuthShell } from "@/components/auth-shell";
-
+import { apiFetch } from "@/lib/api";
 export const Route = createFileRoute("/signin")({
   head: () => ({
     meta: [
@@ -24,7 +24,39 @@ export const Route = createFileRoute("/signin")({
 
 function SignIn() {
   const [signedIn, setSignedIn] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  async function handleSignIn(event: React.FormEvent<HTMLFormElement>) {
+  event.preventDefault();
 
+  setLoading(true);
+  setError("");
+
+  try {
+    const response = await apiFetch<{ message: string; token: string }>("/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    });
+
+    localStorage.setItem("marketday-token", response.token);
+
+    setSignedIn(true);
+  } catch (err) {
+    setError(
+      err instanceof Error ? err.message : "Unable to sign in. Please try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+  }
   return (
     <AuthShell>
       <div>
@@ -38,14 +70,17 @@ function SignIn() {
 
         <form
           className="mt-9 space-y-5"
-          onSubmit={(event) => {
-            event.preventDefault();
-            setSignedIn(true);
-          }}
+          onSubmit={handleSignIn}
         >
           {signedIn ? (
             <div className="rounded-2xl bg-lime px-6 py-4 text-sm font-bold text-ink">
-              Welcome back! Sessions are coming soon — this preview isn't connected to accounts yet.
+              Signed in successfully! Welcome back.
+            </div>
+          ) : null}
+
+          {error ? (
+            <div className="rounded-2xl bg-destructive/10 px-6 py-4 text-sm text-destructive">
+              {error}
             </div>
           ) : null}
           <label className="block">
@@ -56,6 +91,8 @@ function SignIn() {
               required
               type="email"
               placeholder="you@example.com"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
               className="mt-2 w-full rounded-full bg-input px-5 py-3.5 font-mono text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring"
             />
           </label>
@@ -67,6 +104,8 @@ function SignIn() {
               required
               type="password"
               placeholder="Your password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
               className="mt-2 w-full rounded-full bg-input px-5 py-3.5 font-mono text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring"
             />
           </label>
@@ -79,7 +118,7 @@ function SignIn() {
         </form>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          New to MarketDay?{" "}
+          {loading ? "Signing in..." : "Sign in"}
           <Link
             to="/signup"
             className="font-bold text-cobalt transition-colors hover:text-cobalt/80"
