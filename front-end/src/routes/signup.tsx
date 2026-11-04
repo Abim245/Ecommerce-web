@@ -45,7 +45,6 @@ function SignUp() {
   const [bio, setBio] = useState("");
   const [profilePicture, setProfilePicture] = useState("");
   const navigate = useNavigate();
-
 async function handleSignUp(event: React.FormEvent<HTMLFormElement>) {
   event.preventDefault();
 
@@ -54,26 +53,6 @@ async function handleSignUp(event: React.FormEvent<HTMLFormElement>) {
   setCreated(false);
 
   try {
-    if (accountType === "vendor") {
-      await apiFetch("/vendors", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          storeName,
-          location,
-          phone,
-          bio,
-          profilePicture,
-        }),
-      });
-
-      setCreated(true);
-      return;
-    }
-
     const response = await apiFetch<{ message: string; token: string }>(
       "/auth/register",
       {
@@ -92,6 +71,24 @@ async function handleSignUp(event: React.FormEvent<HTMLFormElement>) {
     );
 
     localStorage.setItem("marketday-token", response.token);
+
+    if (accountType === "vendor") {
+      await apiFetch("/vendors", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          storeName,
+          location,
+          phone,
+          bio,
+          profilePicture,
+        }),
+      });
+    }
+
     await navigate({ to: "/" });
   } catch (err) {
     setError(

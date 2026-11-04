@@ -18,6 +18,7 @@ import { Route as OrderConfirmedRouteImport } from './routes/order-confirmed'
 import { Route as ProductsRouteImport } from './routes/products'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as VendorDashboardRouteImport } from './routes/vendor-dashboard'
 import { Route as VendorRegisterRouteImport } from './routes/vendor-register'
 import { Route as ProductsIndexRouteImport } from './routes/products.index'
 import { Route as ProductsProductIdRouteImport } from './routes/products.$productId'
@@ -67,6 +68,11 @@ const SignupRoute = SignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VendorDashboardRoute = VendorDashboardRouteImport.update({
+  id: '/vendor-dashboard',
+  path: '/vendor-dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VendorRegisterRoute = VendorRegisterRouteImport.update({
   id: '/vendor-register',
   path: '/vendor-register',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/products': typeof ProductsRouteWithChildren
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/vendor-dashboard': typeof VendorDashboardRoute
   '/vendor-register': typeof VendorRegisterRoute
   '/products/$productId': typeof ProductsProductIdRoute
   '/products/': typeof ProductsIndexRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/order-confirmed': typeof OrderConfirmedRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/vendor-dashboard': typeof VendorDashboardRoute
   '/vendor-register': typeof VendorRegisterRoute
   '/products/$productId': typeof ProductsProductIdRoute
   '/products': typeof ProductsIndexRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/products': typeof ProductsRouteWithChildren
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
+  '/vendor-dashboard': typeof VendorDashboardRoute
   '/vendor-register': typeof VendorRegisterRoute
   '/products/$productId': typeof ProductsProductIdRoute
   '/products/': typeof ProductsIndexRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/signin'
     | '/signup'
+    | '/vendor-dashboard'
     | '/vendor-register'
     | '/products/$productId'
     | '/products/'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/order-confirmed'
     | '/signin'
     | '/signup'
+    | '/vendor-dashboard'
     | '/vendor-register'
     | '/products/$productId'
     | '/products'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/signin'
     | '/signup'
+    | '/vendor-dashboard'
     | '/vendor-register'
     | '/products/$productId'
     | '/products/'
@@ -179,6 +191,7 @@ export interface RootRouteChildren {
   ProductsRoute: typeof ProductsRouteWithChildren
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
+  VendorDashboardRoute: typeof VendorDashboardRoute
   VendorRegisterRoute: typeof VendorRegisterRoute
 }
 
@@ -247,6 +260,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vendor-dashboard': {
+      id: '/vendor-dashboard'
+      path: '/vendor-dashboard'
+      fullPath: '/vendor-dashboard'
+      preLoaderRoute: typeof VendorDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/vendor-register': {
       id: '/vendor-register'
       path: '/vendor-register'
@@ -295,6 +315,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProductsRoute: ProductsRouteWithChildren,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,
+  VendorDashboardRoute: VendorDashboardRoute,
   VendorRegisterRoute: VendorRegisterRoute,
 }
 export const routeTree = rootRouteImport

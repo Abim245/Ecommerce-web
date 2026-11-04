@@ -144,6 +144,12 @@ export function SiteHeader() {
         {isLoggedIn ? (
           <div className="flex items-center gap-3">
             <Link
+            to="/vendor-dashboard"
+            className="text-sm font-semibold text-foreground transition-colors hover:text-cobalt"
+          >
+            Vendor Dashboard
+          </Link>
+            <Link
               to="/my-orders"
               className="text-sm font-semibold text-foreground transition-colors hover:text-cobalt"
             >
