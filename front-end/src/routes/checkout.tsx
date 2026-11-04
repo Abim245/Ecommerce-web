@@ -13,7 +13,7 @@ import {
   type DeliveryOptionId,
 } from "@/lib/delivery";
 import { cn } from "@/lib/utils";
-
+import { apiFetch } from "@/lib/api";
 export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [
@@ -63,7 +63,8 @@ function Checkout() {
   const navigate = useNavigate();
   const [step, setStep] = useState<"shipping" | "review">("shipping");
   const [details, setDetails] = useState<ShippingDetails>(EMPTY_DETAILS);
-
+  const [placingOrder, setPlacingOrder] = useState(false);
+  const [orderError, setOrderError] = useState("");
   const deliveryFee = deliveryFeeFor(total, details.deliveryOption);
   const grandTotal = total + deliveryFee;
 
@@ -104,27 +105,73 @@ function Checkout() {
       setDetails((prev) => ({ ...prev, [field]: event.target.value }));
     };
 
-  const placeOrder = () => {
-    const orderId = `MD-${Math.floor(100000 + Math.random() * 900000)}`;
+const placeOrder = async () => {
+  setPlacingOrder(true);
+  setOrderError("");
+
+  try {
+    const response = await apiFetch<{
+      message: string;
+      order: {
+        _id: string;
+        subtotal: number;
+        deliveryFee: number;
+        totalAmount: number;
+      };
+    }>("/orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        items: lines.map((line) => ({
+          productId: line.productId,
+          quantity: line.qty,
+        })),
+        deliveryAddress: [
+          `Name: ${details.fullName}`,
+          `Phone: ${details.phone}`,
+          details.address,
+          details.city,
+          details.note ? `Note: ${details.note}` : "",
+        ].filter(Boolean).join(", "),
+        deliveryOption: details.deliveryOption,
+      }),
+    });
+
     try {
       window.sessionStorage.setItem(
         "marketday-last-order",
         JSON.stringify({
-          id: orderId,
+          id: response.order._id,
           itemCount: count,
-          subtotal: total,
-          deliveryFee,
-          total: grandTotal,
+          subtotal: response.order.subtotal,
+          deliveryFee: response.order.deliveryFee,
+          total: response.order.totalAmount,
           deliveryOption: details.deliveryOption,
           fullName: details.fullName,
           address: details.address,
           city: details.city,
         }),
       );
-    } catch {}
+    } catch {
+      // Order is already saved in the backend.
+    }
+
     clear();
-    void navigate({ to: "/order-confirmed" });
-  };
+    await navigate({ to: "/order-confirmed" });
+
+  } catch (err) {
+    setOrderError(
+      err instanceof Error
+        ? err.message
+        : "Unable to place your order. Please try again.",
+    );
+  } finally {
+    setPlacingOrder(false);
+  }
+};
+
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -355,13 +402,22 @@ function Checkout() {
                     </ul>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={placeOrder}
-                    className="w-full rounded-full bg-ink py-4 text-sm font-bold text-primary-foreground transition-colors hover:bg-ink/85"
-                  >
-                    Place order · {formatNaira(grandTotal)}
-                  </button>
+                  {orderError ? (
+                  <p className="mb-3 text-sm font-semibold text-red-600">
+                    {orderError}
+                  </p>
+                ) : null}
+
+                <button
+                  type="button"
+                  onClick={() => void placeOrder()}
+                  disabled={placingOrder}
+                  className="w-full rounded-full bg-ink py-4 text-sm font-bold text-primary-foreground transition-colors hover:bg-ink/85 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {placingOrder
+                    ? "Placing order..."
+                    : `Place order · ${formatNaira(grandTotal)}`}
+                </button>
                   <p className="text-center text-xs text-muted-foreground">
                     You'll pay on delivery. We'll text order updates to {details.phone}.
                   </p>
